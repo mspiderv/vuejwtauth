@@ -1,0 +1,32 @@
+{
+  "name": "vue-jwt-auth",
+  "version": "1.0.0",
+  "description": "JWT auth library for Vue.js applications",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mspiderv/vue-jwt-auth.git"
+  },
+  "keywords": [
+    "vue",
+    "vuejs",
+    "jwt",
+    "auth"
+  ],
+  "author": "Matej Vitaz <mspiderv@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/mspiderv/vue-jwt-auth/issues"
+  },
+  "homepage": "https://github.com/mspiderv/vue-jwt-auth#readme",
+  "dependencies": {
+    "axios": "^0.18.0",
+    "browser-cookies": "^1.2.0",
+    "deepmerge": "^3.2.0",
+    "jwt-decode": "^2.2.0",
+    "vuex": "^3.1.1"
+  }
+}
