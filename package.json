@@ -13,6 +13,7 @@
   "keywords": [
     "vue",
     "vuejs",
+    "vuex",
     "jwt",
     "auth"
   ],
