@@ -5,9 +5,12 @@ import { RefreshTokenException } from './exceptions'
 
 export default class {
   constructor (store, options) {
+    this.options = options
+    store.registerModule(this.options.module, createStoreModule(this))
+
+    // TODO: nespravim toto cele synchronne ?
     this.initializationSequence = new Promise((resolve, reject) => {
-      this.initializeOptions(options)
-        .then(() => this.initializeStore(store))
+      this.initializeStore(store)
         .then(this.initializeTokenStoage.bind(this))
         .then(this.initializeTokenAutoRefresher.bind(this))
         .then(this.initializeLoggedUser.bind(this))
@@ -20,12 +23,7 @@ export default class {
     })
   }
 
-  async initializeOptions (options) {
-    this.options = options
-  }
-
   async initializeStore (store) {
-    await store.registerModule(this.options.module, createStoreModule(this))
     let self = this
     this.store = {
       get 'wrapped' () {

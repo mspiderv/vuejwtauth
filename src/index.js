@@ -52,6 +52,7 @@ export function authGuard (router, options) {
   global.check.auth.unset()
   global.router = router
   global.tryToRunCallback()
+  return router
 }
 
 // This will call after store module was initialized

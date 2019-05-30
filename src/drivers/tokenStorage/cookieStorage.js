@@ -9,7 +9,6 @@ export const defaultOptions = {
 export default class {
   constructor (options) {
     this.options = deepMerge(defaultOptions, options)
-    console.log(this.options)
   }
 
   async setToken (token) {
