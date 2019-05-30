@@ -14,6 +14,7 @@ export const defaultAuthOptions = {
   fetchUserAfterLogin: false,
   refreshTokenAfterLogin: true,
   fetchUserAfterTokenRefreshed: true,
+  fetchUserAfterRememberedLogin: false,
 
   storeModuleExtras: {},
 

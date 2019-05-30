@@ -100,6 +100,9 @@ export default function (auth) {
         await m.setToken.call({ auth, context }, token)
         try {
           await context.dispatch('refreshToken')
+          if (auth.options.fetchUserAfterRememberedLogin) {
+            await context.dispatch('fetchUser')
+          }
         } catch (error) {
           await context.dispatch('logout')
         }
