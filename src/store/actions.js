@@ -1,5 +1,6 @@
 export default function (auth) {
   let o = auth.options
+  let d = o.drivers
   let m = o.methods
   return {
 
@@ -8,16 +9,16 @@ export default function (auth) {
      * This method assumes, we already have some token set in the store.
      */
     async fetchUser (context) {
-      await m.fetchUser.call(
+      const user = await m.fetchUser.call(
         { auth, context },
         o.apiEndpoints.fetchUser.method,
         o.apiEndpoints.fetchUser.url,
         context.getters.token
-      )
-        .then(m.mapResponseToUserData.bind({ auth, context }))
-        .then(m.checkUserObject.bind({ auth, context }))
-        .then(user => context.commit('setUser', user))
-      return context.getters.user
+      ).then(m.mapFetchUserResponseToUserData.bind({ auth, context }))
+
+      context.commit('setUser', user)
+
+      return user
     },
 
     /**
@@ -27,13 +28,12 @@ export default function (auth) {
     async logout (context) {
       let token = context.getters.token
       context.commit('logout')
-      m.serverSideLogout.call(
+      return m.serverSideLogout.call(
         { auth, context },
         o.apiEndpoints.logout.method,
         o.apiEndpoints.logout.url,
         token
-      ).catch(m.handleServerSideLogoutError.bind({ auth, context }))
-      return true
+      )
     },
 
     /**
@@ -41,27 +41,28 @@ export default function (auth) {
      * This method assumes, we already have some token set in the store.
      */
     async refreshToken (context) {
-      await m.refreshToken.call(
-        { auth, context },
-        o.apiEndpoints.refreshToken.method,
-        o.apiEndpoints.refreshToken.url,
-        context.getters.token
-      )
-        .then(m.mapRefreshResponseToToken.bind({ auth, context }))
-        .then(token => context.commit('setToken', token))
-        .then(() => {
-          if (auth.options.fetchUserAfterTokenRefreshed) {
-            return context.dispatch('fetchUser')
-          }
-        })
-      return context.getters.token
+      const token = await m.refreshToken.call(
+          { auth, context },
+          o.apiEndpoints.refreshToken.method,
+          o.apiEndpoints.refreshToken.url,
+          context.getters.token
+        )
+        .then(m.mapRefreshTokenResponseToToken.bind({ auth, context }))
+
+      context.commit('setToken', token)
+
+      if (auth.options.fetchUserAfterTokenRefreshed) {
+        await context.dispatch('fetchUser')
+      }
+
+      return token
     },
 
     async initialize (context) {
-      let token = await m.getRememberedToken.call({ auth, context })
+      let token = await d.tokenStorage.getToken()
       if (token) {
-        context.commit('setRememberMe', true)
         context.commit('setToken', token)
+        context.commit('setRememberMe', true)
         try {
           await context.dispatch('refreshToken')
           if (auth.options.fetchUserAfterRememberedLogin) {
@@ -72,7 +73,6 @@ export default function (auth) {
         }
       }
       context.commit('setInitializedUser')
-      return token || false
     },
 
     async attemptLogin (context, { credentials, rememberMe }) {

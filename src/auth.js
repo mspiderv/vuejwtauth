@@ -13,7 +13,7 @@ export default class {
       this.initializeTokenStoage()
       this.initializeTokenAutoRefresher()
       this.initializeLoggedUser()
-      this.options.methods.initializedCallback.call(this)
+      this.options.methods.onReady.call(this)
     } catch (error) {
       this.options.methods.handleError.call(this, error)
     }
@@ -81,6 +81,8 @@ export default class {
     }
   }
 
+  // TODO: spravit z toho `TokenRefresherDriver`
+  // tie optiony ktore sa toho tykaju dat ako default config toho drivera
   initializeTokenAutoRefresher () {
     if (this.options.autoRefreshToken) {
       let self = this
@@ -115,6 +117,7 @@ export default class {
           refreshIn = Math.min(this.options.maxRefreshTokenSeconds, refreshIn)
           this.tokenRefresher.setTimeout(refreshIn)
         } catch (e) {
+          // TODO: toto nejako domysliet
           throw new RefreshTokenException()
         }
       })

@@ -1,110 +1,111 @@
-import { FetchUserException } from './exceptions'
-
 /**
- * This method is responsible for returning the remembered token (from token storage).
- *
- * @returns {Promise<token>}
- */
-export async function getRememberedToken () {
-  return this.auth.options.drivers.tokenStorage.getToken()
-}
-
-/**
- * This method is responsible for sending API HTTP request for fetching user data.
- *
- * Called after 'fetchUser' action.
+ * Responsible for fetching the user by sending a HTTP request to API.
  *
  * @param method
  * @param url
  * @param token
- * @returns {Promise<*>}
+ * @return Promise<response>
  */
 export async function fetchUser (method, url, token) {
   return this.auth.options.drivers.http.sendAuthenticatedRequest(method, url, token)
 }
 
 /**
- * This method is used for mapping API HTTP response to user object.
+ * Responsible for server-side logout by sending a HTTP request to API.
  *
- * Called after 'fetchUser' method.
- *
- * @param response
- * @returns user object
+ * @param method
+ * @param url
+ * @param token
+ * @return Promise<response>
  */
-export function mapResponseToUserData (response) {
-  return response.data.user
-}
-
-/**
- * This method should check incomming user object. If the check fails, it should throw any error.
- *
- * Called after 'mapResponseToUserData' method.
- *
- * @throws Any error if needed
- * @param user object
- * @returns the same user object
- */
-export function checkUserObject (user) {
-  if (typeof user !== 'object') {
-    throw new FetchUserException(`Failed to read user data from API HTTP response.`)
-  }
-
-  return user
-}
-
 export async function serverSideLogout (method, url, token) {
   return this.auth.options.drivers.http.sendAuthenticatedRequest(method, url, token)
 }
 
-export function handleServerSideLogoutError (error) {
-  console.log('Error during logout on server side, but successfully logged out on client side.', error)
-}
-
+/**
+ * Responsible for refreshing the token by sending a HTTP request to API.
+ *
+ * @param method
+ * @param url
+ * @param token
+ * @return Promise<response>
+ */
 export async function refreshToken (method, url, token) {
   return this.auth.options.drivers.http.sendAuthenticatedRequest(method, url, token)
 }
 
 /**
- * This method is used for mapping API HTTP response to token string.
+ * Responsible for logging in by sending a HTTP request to API.
  *
- * Called after 'refreshToken' method.
- *
- * @param response
- * @returns token
+ * @param method
+ * @param url
+ * @param credentials
+ * @return Promise<response>
  */
-export function mapRefreshResponseToToken (response) {
-  return response.data.token
-}
-
-export function mapCredentialsToRequestData (credentials) {
-  return credentials
-}
-
 export async function attemptLogin (method, url, credentials) {
   return this.auth.options.drivers.http.sendRequest(
     method,
     url,
-    this.auth.options.methods.mapCredentialsToRequestData(credentials)
+    credentials
   )
 }
 
+
+//
+// Response mappers
+//
+
+/**
+ * Responsible for mapping `attemptLogin` response to token.
+ *
+ * @param response
+ * @return token
+ */
 export function mapLoginResponseToToken (response) {
   return response.data.token
 }
 
+
 /**
- * this points to auth instance
- * @return {Promise<void>}
+ * Responsible for mapping `refreshToken` response to token.
+ *
+ * @param response
+ * @return token
  */
-export function initializedCallback () {
-  console.log('Auth::initialized', this)
+export function mapRefreshTokenResponseToToken (response) {
+  return response.data.token
 }
 
 /**
- * this points to auth instance
- * @param error
+ * Responsible for mapping `fetchUser` response to user data object.
+ *
+ * @param response
+ * @return user data object
+ */
+export function mapFetchUserResponseToUserData (response) {
+  return response.data.user
+}
+
+//
+// Auth callbacks
+//
+
+/**
+ * Responsible for handling auth ready callback.
+ *
+ * `this` points to auth instance
  * @return {Promise<void>}
  */
+export function onReady () {
+  //
+}
+
+/**
+ * Responsible for handling auth errors.
+ *
+ * `this` points to auth instance
+ * @param error
+ */
 export function handleError (error) {
-  console.error('Auth::error', this, error)
+  console.error('Auth error', error)
 }
