@@ -1,9 +1,7 @@
 export default function (auth) {
   return {
     setToken (state, token) {
-      state.token = (typeof token === 'string' && token.length > 0)
-        ? token
-        : null
+      state.token = token
     },
 
     setInitializedUser (state) {

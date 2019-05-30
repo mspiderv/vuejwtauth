@@ -1,19 +1,6 @@
 import { FetchUserException } from './exceptions'
 
 /**
- * This method is responsible for returning the current token (from store).
- *
- * @returns {Promise<token>}
- */
-export async function getToken () {
-  return this.context.getters.token
-}
-
-export async function getUser () {
-  return this.context.getters.user
-}
-
-/**
  * This method is responsible for returning the remembered token (from token storage).
  *
  * @returns {Promise<token>}
@@ -44,7 +31,7 @@ export async function fetchUser (method, url, token) {
  * @param response
  * @returns user object
  */
-export async function mapResponseToUserData (response) {
+export function mapResponseToUserData (response) {
   return response.data.user
 }
 
@@ -57,7 +44,7 @@ export async function mapResponseToUserData (response) {
  * @param user object
  * @returns the same user object
  */
-export async function checkUserObject (user) {
+export function checkUserObject (user) {
   if (typeof user !== 'object') {
     throw new FetchUserException(`Failed to read user data from API HTTP response.`)
   }
@@ -65,27 +52,11 @@ export async function checkUserObject (user) {
   return user
 }
 
-/**
- * This method should set the current user and it should not perform any checks and should not throw any errors.
- *
- * Called after 'checkUserObject' method.
- *
- * @param user - Valid (checked) user object.
- * @returns void
- */
-export async function setUser (user) {
-  this.context.commit('setUser', user)
-}
-
-export async function clientSideLogout () {
-  this.context.commit('logout')
-}
-
 export async function serverSideLogout (method, url, token) {
   return this.auth.options.drivers.http.sendAuthenticatedRequest(method, url, token)
 }
 
-export async function handleServerSideLogoutError (error) {
+export function handleServerSideLogoutError (error) {
   console.log('Error during logout on server side, but successfully logged out on client side.', error)
 }
 
@@ -101,43 +72,23 @@ export async function refreshToken (method, url, token) {
  * @param response
  * @returns token
  */
-export async function mapRefreshResponseToToken (response) {
+export function mapRefreshResponseToToken (response) {
   return response.data.token
 }
 
-/**
- * This method should set the current token and it should not perform any checks and should not throw any errors.
- *
- * Called after 'mapRefreshResponseToToken' method.
- *
- * @param token
- * @returns void
- */
-export async function setToken (token) {
-  this.context.commit('setToken', token)
-}
-
-export async function setInitializedUser () {
-  this.context.commit('setInitializedUser')
-}
-
-export async function mapCredentialsToRequestData (credentials) {
+export function mapCredentialsToRequestData (credentials) {
   return credentials
-}
-
-export async function setRememberMe (rememberMe) {
-  this.context.commit('setRememberMe', rememberMe)
 }
 
 export async function attemptLogin (method, url, credentials) {
   return this.auth.options.drivers.http.sendRequest(
     method,
     url,
-    await this.auth.options.methods.mapCredentialsToRequestData(credentials)
+    this.auth.options.methods.mapCredentialsToRequestData(credentials)
   )
 }
 
-export async function mapLoginResponseToToken (response) {
+export function mapLoginResponseToToken (response) {
   return response.data.token
 }
 
@@ -145,7 +96,7 @@ export async function mapLoginResponseToToken (response) {
  * this points to auth instance
  * @return {Promise<void>}
  */
-export async function initializedCallback () {
+export function initializedCallback () {
   console.log('Auth::initialized', this)
 }
 
@@ -154,27 +105,6 @@ export async function initializedCallback () {
  * @param error
  * @return {Promise<void>}
  */
-export async function handleError (error) {
+export function handleError (error) {
   console.error('Auth::error', this, error)
-}
-
-// After callbacks
-export async function afterFetchUser () {
-  //
-}
-
-export async function afterLogout () {
-  //
-}
-
-export async function afterRefreshToken () {
-  //
-}
-
-export async function afterInitialize () {
-  //
-}
-
-export async function afterLogin () {
-  //
 }

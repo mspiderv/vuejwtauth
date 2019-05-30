@@ -48,8 +48,8 @@ let global = {
 
 // This will call after router was initialized
 export function authGuard (router, options) {
-  global.routerOptions = mergeRouterOptions(options)
   global.check.auth.unset()
+  global.routerOptions = mergeRouterOptions(options)
   global.router = router
   global.tryToRunCallback()
   return router
@@ -57,9 +57,9 @@ export function authGuard (router, options) {
 
 // This will call after store module was initialized
 export function createAuthStoreModule (options) {
+  global.check.auth.unset()
   global.authOptions = mergeAuthOptions(options)
   return store => {
-    global.check.auth.unset()
     global.auth = new Auth(store, global.authOptions)
     global.tryToRunCallback()
   }

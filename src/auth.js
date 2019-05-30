@@ -6,31 +6,27 @@ import { RefreshTokenException } from './exceptions'
 export default class {
   constructor (store, options) {
     this.options = options
-    store.registerModule(this.options.module, createStoreModule(this))
 
-    // TODO: nespravim toto cele synchronne ?
-    this.initializationSequence = new Promise((resolve, reject) => {
+    try {
+      store.registerModule(this.options.module, createStoreModule(this))
       this.initializeStore(store)
-        .then(this.initializeTokenStoage.bind(this))
-        .then(this.initializeTokenAutoRefresher.bind(this))
-        .then(this.initializeLoggedUser.bind(this))
-        .then(() => this.options.methods.initializedCallback.call(this))
-        .then(resolve)
-        .catch(error => {
-          reject(error)
-          this.options.methods.handleError.call(this, error)
-        })
-    })
+      this.initializeTokenStoage()
+      this.initializeTokenAutoRefresher()
+      this.initializeLoggedUser()
+      this.options.methods.initializedCallback.call(this)
+    } catch (error) {
+      this.options.methods.handleError.call(this, error)
+    }
   }
 
-  async initializeStore (store) {
+  initializeStore (store) {
     let self = this
     this.store = {
       get 'wrapped' () {
         return store
       },
 
-      async dispatch (action, ...params) {
+      dispatch (action, ...params) {
         return store.dispatch(this.helpers.prefix + action, ...params)
       },
 
@@ -59,6 +55,7 @@ export default class {
         }
       },
 
+      // TODO: toto je zbytocny koncept, prerobit tak aby to pouzivalo iba `store.subscribe` resp. `store.subscribeAction`
       mutationObserver: new EventEmitter()
     }
     this.store.subscribe((mutation, state) => {
@@ -66,7 +63,7 @@ export default class {
     })
   }
 
-  async initializeTokenStoage () {
+  initializeTokenStoage () {
     if (this.options.autoSyncTokenStoage) {
       // Save token to the storage after `setToken` mutation was commited
       this.store.mutationObserver.on('setToken', () => {
@@ -84,7 +81,7 @@ export default class {
     }
   }
 
-  async initializeTokenAutoRefresher () {
+  initializeTokenAutoRefresher () {
     if (this.options.autoRefreshToken) {
       let self = this
       this.tokenRefresher = {
@@ -99,14 +96,14 @@ export default class {
           this.refreshTokenTimeout = setTimeout(this.refreshTokenHandler.bind(this), timeout * 1000)
         },
 
-        async refreshTokenHandler () {
+        refreshTokenHandler () {
           if (self.store.getter('logged')) {
-            await self.store.dispatch('refreshToken')
+            self.store.dispatch('refreshToken')
           }
         }
       }
 
-      this.store.mutationObserver.on('setToken', async () => {
+      this.store.mutationObserver.on('setToken', () => {
         this.tokenRefresher.clearTimeout()
         try {
           let token = this.store.getter('token')
@@ -124,34 +121,25 @@ export default class {
     }
   }
 
-  async initializeLoggedUser () {
+  initializeLoggedUser () {
     if (this.options.autoInitialize) {
-      await this.store.dispatch('initialize')
+      this.store.dispatch('initialize')
     }
   }
 
-  async initializeRouter (router, routerOptions) {
+  initializeRouter (router, routerOptions) {
     this.router = router
     this.routerOptions = routerOptions
 
-    await this.initializationSequence
-
-    return new Promise((resolve, reject) => {
-      this.router.onReady(async () => {
-        try {
-          await this.initializeRouterGuard()
-          await this.initializeRouterRedirects()
-          await this.redirectIfNeed()
-          await this.store.commit('setInitializedRouter')
-          resolve()
-        } catch (error) {
-          reject(error)
-        }
-      })
+    this.router.onReady(() => {
+      this.initializeRouterGuard()
+      this.initializeRouterRedirects()
+      this.redirectIfNeed()
+      this.store.commit('setInitializedRouter')
     })
   }
 
-  async initializeRouterGuard () {
+  initializeRouterGuard () {
     this.router.beforeEach((to, from, next) => {
       if (to.matched.some(route => route.meta[this.routerOptions.authMeta.key] === this.routerOptions.authMeta.value.authenticated)) {
         // Accesing route only for authenticated users
@@ -181,13 +169,13 @@ export default class {
     })
   }
 
-  async initializeRouterRedirects () {
-    this.store.subscribe(async (mutation, state) => {
-      await this.redirectIfNeed()
+  initializeRouterRedirects () {
+    this.store.subscribe((mutation, state) => {
+      this.redirectIfNeed()
     })
   }
 
-  async redirectIfNeed () {
+  redirectIfNeed () {
     if (this.router.currentRoute.matched.some(route =>
       route.meta[this.routerOptions.authMeta.key] ===
       this.routerOptions.authMeta.value.authenticated
