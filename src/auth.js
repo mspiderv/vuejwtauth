@@ -37,16 +37,16 @@ export class VueJwtAuth {
     if (this.options.autoSyncTokenStoage) {
       this.store.subscribe((mutation, state) => {
         // Save token to the storage after `setToken` mutation was commited
-        if (mutation.type === 'setToken') {
-          let token = this.store.getter('token')
-          if (this.store.getter('rememberMe') && token !== undefined && token !== null) {
+        if (mutation.type === `${this.options.module}/setToken`) {
+          let token = this.context.getters.token
+          if (this.context.getters.rememberMe && token !== undefined && token !== null) {
             this.options.drivers.tokenStorage.setToken(token)
           } else {
             this.options.drivers.tokenStorage.deleteToken()
           }
         }
         // Remove token from the storage after `logout` mutation was commited
-        if (mutation.type === 'setToken') {
+        if (mutation.type === `${this.options.module}/logout`) {
           this.options.drivers.tokenStorage.deleteToken()
         }
       })
@@ -78,7 +78,7 @@ export class VueJwtAuth {
       }
 
       this.store.subscribe((mutation, state) => {
-        if (mutation.type === 'setToken') {
+        if (mutation.type === `${this.options.module}/setToken`) {
           this.tokenRefresher.clearTimeout()
           try {
             let token = this.context.getters.token
