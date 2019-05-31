@@ -1,6 +1,6 @@
 # JSON Web Tokens auth for Vue.js
 
-This is a client-side JSON Web Tokens (JWT) authentication library for Vue.js applications.
+This is a client-side [JSON Web Tokens (JWT)](https://jwt.io/) authentication library for [Vue.js](https://vuejs.org/) applications.
 
 ## Contents
 
@@ -11,7 +11,7 @@ This is a client-side JSON Web Tokens (JWT) authentication library for Vue.js ap
 ## Requirements
 
 1. This package assumes, you use [VueRouter](https://router.vuejs.org/) in your application.
-2. Available JWT auth server (server-side JWT auth).
+2. JWT auth server.
 
 ## Do you need server-side JWT auth ?
 Take a look at our Laravel server-side package. - *comming soon*
