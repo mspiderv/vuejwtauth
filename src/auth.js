@@ -1,7 +1,6 @@
 import { deepMerge } from './utils'
 import createStoreModule from './store'
 import { mergeOptions } from './options'
-import { RefreshTokenException } from './exceptions'
 
 export class VueJwtAuth {
   constructor ({ Vue, router, store, options }) {
@@ -90,19 +89,14 @@ export class VueJwtAuth {
         }
         if (mutation.type === `${this.options.module}/setToken`) {
           this.tokenRefresher.clearTimeout()
-          try {
-            let token = this.context.getters.token
-            let decodedToken = this.options.drivers.tokenDecoder.decode(token)
-            let now = Math.floor(0 + new Date() / 1000)
-            let serverNowDelta = now - decodedToken.iat
-            let refreshIn = decodedToken.exp - decodedToken.iat - serverNowDelta - this.options.refreshTokenSecondsAhead
-            refreshIn = Math.max(this.options.minRefreshTokenSeconds, refreshIn)
-            refreshIn = Math.min(this.options.maxRefreshTokenSeconds, refreshIn)
-            this.tokenRefresher.setTimeout(refreshIn)
-          } catch (e) {
-            // TODO: toto nejako domysliet
-            throw new RefreshTokenException()
-          }
+          let token = this.context.getters.token
+          let decodedToken = this.options.drivers.tokenDecoder.decode(token)
+          let now = Math.floor(0 + new Date() / 1000)
+          let serverNowDelta = now - decodedToken.iat
+          let refreshIn = decodedToken.exp - decodedToken.iat - serverNowDelta - this.options.refreshTokenSecondsAhead
+          refreshIn = Math.max(this.options.minRefreshTokenSeconds, refreshIn)
+          refreshIn = Math.min(this.options.maxRefreshTokenSeconds, refreshIn)
+          this.tokenRefresher.setTimeout(refreshIn)
         }
       })
     }
