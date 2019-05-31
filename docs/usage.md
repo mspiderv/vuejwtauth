@@ -113,3 +113,5 @@ export default {
 }
 </script>
 ```
+
+###### Continue reading to [Protecting routes](protect-routes.md)

@@ -7,6 +7,7 @@ This is a client-side [JSON Web Tokens (JWT)](https://jwt.io/) authentication li
 1. [Installation](docs/installation.md)
 2. [Usage](docs/usage.md)
 3. [Protecting routes](docs/protect-routes.md)
+4. [Configuration](docs/configuration.md)
 
 ## Requirements
 

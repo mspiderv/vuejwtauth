@@ -14,8 +14,10 @@ npm install @mspiderv/vuejwtauth --save
 
 ### Update your application code
 
-In order to use this library, you need to create a new instance of `VueJwtAuth` class and pass these objects as constructor arguments:
- - `router` - Your [VueRouter](https://router.vuejs.org/) instance (*required argument*)
+In order to use this library, you need to create a new instance of `VueJwtAuth` class and pass an object with these properties as the only constructor argument:
+ - `Vue` - [Vue](https://vuejs.org/) class (**required argument**)
+ - `router` - Your [VueRouter](https://router.vuejs.org/) instance (**required argument**)
+ - `store` - Your [Vuex](https://vuejs.org/) instance (*optional argument*)
  - `options` - [Options object](configuration.md) (*optional argument*)
 
 #### Example in Vue.js application
@@ -73,3 +75,5 @@ new Vue({
 }).$mount('#app')
 
 ```
+
+###### Continue reading to [Usage](usage.md)

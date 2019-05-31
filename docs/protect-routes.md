@@ -55,3 +55,5 @@ Public routes can be accessed by both **authenticated and unauthenticated** user
 ## Note
 
 You can change `auth` meta key and `true`, `false` and `null` values for authenticated, unauthenticated and public routes in [options object](configuration.md).
+
+###### Continue reading to [Configuration](configuration.md)
