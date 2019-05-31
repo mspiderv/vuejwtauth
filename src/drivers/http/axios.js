@@ -7,7 +7,7 @@ export const defaultOptions = {
   authorizationHeader: 'Authorization'
 }
 
-export default class {
+export class AxiosHttpDriver {
   constructor (options) {
     this.options = deepMerge(defaultOptions, options)
   }

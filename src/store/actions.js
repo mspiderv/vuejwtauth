@@ -72,7 +72,7 @@ export default function (auth) {
           await context.dispatch('logout')
         }
       }
-      context.commit('setInitializedUser')
+      context.commit('setReady')
     },
 
     async attemptLogin (context, { credentials, rememberMe }) {

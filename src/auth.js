@@ -1,82 +1,54 @@
 import { deepMerge } from './utils'
 import { EventEmitter } from 'events'
 import createStoreModule from './store'
+import { mergeOptions } from './options'
 import { RefreshTokenException } from './exceptions'
 
-export default class {
-  constructor (store, options) {
-    this.options = options
+export class VueJwtAuth {
+  constructor (router, store, options) {
+    this.store = store
+    this.router = router
+    this.options = mergeOptions(options)
 
     try {
-      store.registerModule(this.options.module, createStoreModule(this))
-      this.initializeStore(store)
-      this.initializeTokenStoage()
-      this.initializeTokenAutoRefresher()
-      this.initializeLoggedUser()
+      this.initialize()
       this.options.methods.onReady.call(this)
     } catch (error) {
       this.options.methods.handleError.call(this, error)
     }
   }
 
-  initializeStore (store) {
-    let self = this
-    this.store = {
-      get 'wrapped' () {
-        return store
-      },
+  initialize () {
+    this.initializeStore()
+    this.initializeTokenStoage()
+    this.initializeTokenAutoRefresher()
+    this.initializeLoggedUser()
+    this.initializeRouterGuard()
+    this.initializeRouterRedirects()
+  }
 
-      dispatch (action, ...params) {
-        return store.dispatch(this.helpers.prefix + action, ...params)
-      },
-
-      commit (mutation, ...params) {
-        return store.commit(this.helpers.prefix + mutation, ...params)
-      },
-
-      subscribe (callback) {
-        return store.subscribe((mutation, state) => {
-          mutation.type = this.helpers.unprefixName(mutation.type)
-          return callback(mutation, state)
-        })
-      },
-
-      getter (getter) {
-        return store.getters[this.helpers.prefix + getter]
-      },
-
-      helpers: {
-        get 'prefix' () {
-          return `${self.options.module}/`
-        },
-
-        unprefixName (prefixedName) {
-          return prefixedName.slice(this.prefix.length)
-        }
-      },
-
-      // TODO: toto je zbytocny koncept, prerobit tak aby to pouzivalo iba `store.subscribe` resp. `store.subscribeAction`
-      mutationObserver: new EventEmitter()
-    }
-    this.store.subscribe((mutation, state) => {
-      this.store.mutationObserver.emit(mutation.type, mutation.payload, state)
-    })
+  initializeStore () {
+    this.store.registerModule(this.options.module, createStoreModule(this))
+    // TODO: Maybe there is cleaner way to retrieve module context
+    this.context = this.store._modulesNamespaceMap[this.options.module + '/'].context
   }
 
   initializeTokenStoage () {
     if (this.options.autoSyncTokenStoage) {
-      // Save token to the storage after `setToken` mutation was commited
-      this.store.mutationObserver.on('setToken', () => {
-        let token = this.store.getter('token')
-        if (this.store.getter('rememberMe') && token !== undefined && token !== null) {
-          this.options.drivers.tokenStorage.setToken(token)
-        } else {
+      this.store.subscribe((mutation, state) => {
+        // Save token to the storage after `setToken` mutation was commited
+        if (mutation.type === 'setToken') {
+          let token = this.store.getter('token')
+          if (this.store.getter('rememberMe') && token !== undefined && token !== null) {
+            this.options.drivers.tokenStorage.setToken(token)
+          } else {
+            this.options.drivers.tokenStorage.deleteToken()
+          }
+        }
+        // Remove token from the storage after `logout` mutation was commited
+        if (mutation.type === 'setToken') {
           this.options.drivers.tokenStorage.deleteToken()
         }
-      })
-      // Remove token from the storage after `logout` mutation was commited
-      this.store.mutationObserver.on('logout', () => {
-        this.options.drivers.tokenStorage.deleteToken()
       })
     }
   }
@@ -99,26 +71,28 @@ export default class {
         },
 
         refreshTokenHandler () {
-          if (self.store.getter('logged')) {
-            self.store.dispatch('refreshToken')
+          if (self.context.getters.logged) {
+            self.context.dispatch('refreshToken')
           }
         }
       }
 
-      this.store.mutationObserver.on('setToken', () => {
-        this.tokenRefresher.clearTimeout()
-        try {
-          let token = this.store.getter('token')
-          let decodedToken = this.options.drivers.tokenDecoder.decode(token)
-          let now = Math.floor(0 + new Date() / 1000)
-          let serverNowDelta = now - decodedToken.iat
-          let refreshIn = decodedToken.exp - decodedToken.iat - serverNowDelta - this.options.refreshTokenSecondsAhead
-          refreshIn = Math.max(this.options.minRefreshTokenSeconds, refreshIn)
-          refreshIn = Math.min(this.options.maxRefreshTokenSeconds, refreshIn)
-          this.tokenRefresher.setTimeout(refreshIn)
-        } catch (e) {
-          // TODO: toto nejako domysliet
-          throw new RefreshTokenException()
+      this.store.subscribe((mutation, state) => {
+        if (mutation.type === 'setToken') {
+          this.tokenRefresher.clearTimeout()
+          try {
+            let token = this.context.getters.token
+            let decodedToken = this.options.drivers.tokenDecoder.decode(token)
+            let now = Math.floor(0 + new Date() / 1000)
+            let serverNowDelta = now - decodedToken.iat
+            let refreshIn = decodedToken.exp - decodedToken.iat - serverNowDelta - this.options.refreshTokenSecondsAhead
+            refreshIn = Math.max(this.options.minRefreshTokenSeconds, refreshIn)
+            refreshIn = Math.min(this.options.maxRefreshTokenSeconds, refreshIn)
+            this.tokenRefresher.setTimeout(refreshIn)
+          } catch (e) {
+            // TODO: toto nejako domysliet
+            throw new RefreshTokenException()
+          }
         }
       })
     }
@@ -126,41 +100,29 @@ export default class {
 
   initializeLoggedUser () {
     if (this.options.autoInitialize) {
-      this.store.dispatch('initialize')
+      this.context.dispatch('initialize')
     }
-  }
-
-  initializeRouter (router, routerOptions) {
-    this.router = router
-    this.routerOptions = routerOptions
-
-    this.router.onReady(() => {
-      this.initializeRouterGuard()
-      this.initializeRouterRedirects()
-      this.redirectIfNeed()
-      this.store.commit('setInitializedRouter')
-    })
   }
 
   initializeRouterGuard () {
     this.router.beforeEach((to, from, next) => {
-      if (to.matched.some(route => route.meta[this.routerOptions.authMeta.key] === this.routerOptions.authMeta.value.authenticated)) {
+      if (to.matched.some(route => route.meta[this.options.authMeta.key] === this.options.authMeta.value.authenticated)) {
         // Accesing route only for authenticated users
-        if (this.store.getter('logged')) {
+        if (this.context.getters.logged) {
           // We are logged, so we can continue
           next()
         } else {
           // We are not logged, so we need to login first
           next(deepMerge(
             { params: { nextUrl: to.fullPath } },
-            this.routerOptions.redirects.unauthenticated
+            this.options.redirects.unauthenticated
           ))
         }
-      } else if (to.matched.some(route => route.meta[this.routerOptions.authMeta.key] === this.routerOptions.authMeta.value.unauthenticated)) {
+      } else if (to.matched.some(route => route.meta[this.options.authMeta.key] === this.options.authMeta.value.unauthenticated)) {
         // Accesing route only for unauthenticated users
-        if (this.store.getter('logged')) {
+        if (this.context.getters.logged) {
           // We are logged, so we need to redirect
-          next(this.routerOptions.redirects.authenticated)
+          next(this.options.redirects.authenticated)
         } else {
           // We are not logged, so we can continue
           next()
@@ -180,25 +142,25 @@ export default class {
 
   redirectIfNeed () {
     if (this.router.currentRoute.matched.some(route =>
-      route.meta[this.routerOptions.authMeta.key] ===
-      this.routerOptions.authMeta.value.authenticated
+      route.meta[this.options.authMeta.key] ===
+      this.options.authMeta.value.authenticated
     )) {
       // Accesing route only for authenticated users
-      if (!this.store.getter('logged')) {
+      if (!this.context.getters.logged) {
         // We are not logged, so we need to login first
         this.router.push(deepMerge(
           { params: { nextUrl: this.router.currentRoute.fullPath } },
-          this.routerOptions.redirects.unauthenticated
+          this.options.redirects.unauthenticated
         ))
       }
     } else if (this.router.currentRoute.matched.some(route =>
-      route.meta[this.routerOptions.authMeta.key] ===
-      this.routerOptions.authMeta.value.unauthenticated
+      route.meta[this.options.authMeta.key] ===
+      this.options.authMeta.value.unauthenticated
     )) {
       // Accesing route only for unauthenticated users
-      if (this.store.getter('logged')) {
+      if (this.context.getters.logged) {
         // We are logged, so we need to redirect
-        this.router.push(this.routerOptions.redirects.authenticated)
+        this.router.push(this.options.redirects.authenticated)
       }
     }
   }

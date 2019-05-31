@@ -2,7 +2,7 @@ export default function (auth) {
   return {
 
     ready (state) {
-      return state.initializedUser === true && state.initializedRouter === true
+      return state.ready
     },
 
     logged (state) {

@@ -4,12 +4,8 @@ export default function (auth) {
       state.token = token
     },
 
-    setInitializedUser (state) {
-      state.initializedUser = true
-    },
-
-    setInitializedRouter (state) {
-      state.initializedRouter = true
+    setReady (state) {
+      state.ready = true
     },
 
     setUser (state, user) {

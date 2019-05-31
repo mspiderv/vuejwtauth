@@ -5,7 +5,7 @@ export const defaultOptions = {
   //
 }
 
-export default class {
+export class DefaultJwtTokenDecoder {
   constructor (options) {
     this.options = deepMerge(defaultOptions, options)
   }

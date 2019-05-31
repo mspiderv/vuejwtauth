@@ -6,7 +6,7 @@ export const defaultOptions = {
   setConfig: {}
 }
 
-export default class {
+export class CookieTokenStorageDriver {
   constructor (options) {
     this.options = deepMerge(defaultOptions, options)
   }

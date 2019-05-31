@@ -1,7 +1,6 @@
 export default function (auth) {
   return {
-    initializedUser: false,
-    initializedRouter: false,
+    ready: false,
     token: null,
     user: {},
     rememberMe: false

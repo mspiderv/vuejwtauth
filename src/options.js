@@ -1,11 +1,11 @@
 import { deepMerge } from './utils'
-import AxiosHttpDriver from './drivers/http/axios'
-import CookieTokenStorageDriver from './drivers/tokenStorage/cookieStorage'
-import JwtTokenDecoder from './drivers/tokenDecoder/jwtDecode'
+import { AxiosHttpDriver } from './drivers'
+import { DefaultJwtTokenDecoder } from './drivers'
+import { CookieTokenStorageDriver } from './drivers'
 
 import * as methods from './methods'
 
-export const defaultAuthOptions = {
+export const defaultOptions = {
   module: 'auth',
   namespacedModule: true,
 
@@ -35,8 +35,8 @@ export const defaultAuthOptions = {
 
   drivers: {
     http: new AxiosHttpDriver(),
-    tokenStorage: new CookieTokenStorageDriver(),
-    tokenDecoder: new JwtTokenDecoder()
+    tokenDecoder: new DefaultJwtTokenDecoder(),
+    tokenStorage: new CookieTokenStorageDriver()
   },
 
   apiEndpoints: {
@@ -58,10 +58,8 @@ export const defaultAuthOptions = {
     }
   },
 
-  methods
-}
+  methods,
 
-export const defaultRouterOptions = {
   authMeta: {
     key: 'auth',
     value: {
@@ -76,10 +74,6 @@ export const defaultRouterOptions = {
   }
 }
 
-export function mergeAuthOptions (options) {
-  return deepMerge(defaultAuthOptions, options)
-}
-
-export function mergeRouterOptions (options) {
-  return deepMerge(defaultRouterOptions, options)
+export function mergeOptions (options) {
+  return deepMerge(defaultOptions, options)
 }

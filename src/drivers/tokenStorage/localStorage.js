@@ -4,7 +4,7 @@ export const defaultOptions = {
   tokenKey: 'auth_token'
 }
 
-export default class {
+export class LocalStorageTokenStorageDriver {
   constructor (options) {
     this.options = deepMerge(defaultOptions, options)
   }
