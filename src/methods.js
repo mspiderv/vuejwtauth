@@ -1,3 +1,7 @@
+a//
+// HTTP API requests senders
+//
+
 /**
  * Responsible for fetching the user by sending a HTTP request to API.
  *
