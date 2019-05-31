@@ -82,7 +82,7 @@ export default function (auth) {
         options.apiEndpoints.login.url,
         credentials,
         context.getters.token
-        )
+      )
         .then(methods.mapLoginResponseToToken.bind({ auth, context }))
         .then(token => context.commit('setToken', token))
         .then(() => context.commit('setLogged', true))
@@ -127,7 +127,7 @@ export default function (auth) {
         options.apiEndpoints.refreshToken.method,
         options.apiEndpoints.refreshToken.url,
         context.getters.token
-        )
+      )
         .then(methods.mapRefreshTokenResponseToToken.bind({ auth, context }))
 
       context.commit('setToken', token)
@@ -160,11 +160,11 @@ export default function (auth) {
      */
     async fetchUser (context) {
       const user = await methods.fetchUser.call(
-          { auth, context },
-          options.apiEndpoints.fetchUser.method,
-          options.apiEndpoints.fetchUser.url,
-          context.getters.token
-        )
+        { auth, context },
+        options.apiEndpoints.fetchUser.method,
+        options.apiEndpoints.fetchUser.url,
+        context.getters.token
+      )
         .then(methods.mapFetchUserResponseToUserData.bind({ auth, context }))
 
       context.commit('setUser', user)

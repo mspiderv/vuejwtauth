@@ -76,7 +76,6 @@ export function mapLoginResponseToToken (response) {
   return response.data.token
 }
 
-
 /**
  * Responsible for mapping `refreshToken` response to token.
  *

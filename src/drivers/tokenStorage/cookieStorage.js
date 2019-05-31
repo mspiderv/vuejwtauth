@@ -1,14 +1,14 @@
 import cookies from 'browser-cookies'
 import { deepMerge } from '../../utils'
 
-export const defaultOptions = {
+export const CookieTokenStorageDriverDefaultOptions = {
   tokenKey: 'auth_token',
   setConfig: {}
 }
 
 export class CookieTokenStorageDriver {
   constructor (options) {
-    this.options = deepMerge(defaultOptions, options)
+    this.options = deepMerge(CookieTokenStorageDriverDefaultOptions, options)
   }
 
   async setToken (token) {

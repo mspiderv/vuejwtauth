@@ -1,13 +1,13 @@
 import jwtDecode from 'jwt-decode'
 import { deepMerge } from '../../utils'
 
-export const defaultOptions = {
+export const DefaultJwtTokenDecoderDefaultOptions = {
   //
 }
 
 export class DefaultJwtTokenDecoder {
   constructor (options) {
-    this.options = deepMerge(defaultOptions, options)
+    this.options = deepMerge(DefaultJwtTokenDecoderDefaultOptions, options)
   }
 
   /**

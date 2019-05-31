@@ -1,7 +1,7 @@
 import axios from 'axios'
 import { deepMerge } from '../../utils'
 
-export const defaultOptions = {
+export const AxiosHttpDriverDefaultOptions = {
   tokenType: 'Bearer',
   apiBaseURL: '/',
   authorizationHeader: 'Authorization'
@@ -9,7 +9,7 @@ export const defaultOptions = {
 
 export class AxiosHttpDriver {
   constructor (options) {
-    this.options = deepMerge(defaultOptions, options)
+    this.options = deepMerge(AxiosHttpDriverDefaultOptions, options)
   }
 
   // Send request helpers

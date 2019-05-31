@@ -4,6 +4,7 @@
   "description": "JWT auth library for Vue.js applications",
   "main": "src/index.js",
   "scripts": {
+    "lint": "eslint --ext .js src",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -29,5 +30,12 @@
     "deepmerge": "^3.2.0",
     "jwt-decode": "^2.2.0",
     "vuex": "^3.1.1"
+  },
+  "devDependencies": {
+    "@vue/eslint-config-standard": "^4.0.0",
+    "babel-eslint": "^10.0.1",
+    "eslint": "^5.10.0",
+    "eslint-loader": "^2.1.1",
+    "eslint-plugin-vue": "^5.0.0"
   }
 }

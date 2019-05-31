@@ -1,7 +1,5 @@
 import { deepMerge } from './utils'
-import { AxiosHttpDriver } from './drivers'
-import { DefaultJwtTokenDecoder } from './drivers'
-import { CookieTokenStorageDriver } from './drivers'
+import { AxiosHttpDriver, DefaultJwtTokenDecoder, CookieTokenStorageDriver } from './drivers'
 
 import * as methods from './methods'
 

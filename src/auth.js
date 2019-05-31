@@ -1,5 +1,4 @@
 import { deepMerge } from './utils'
-import { EventEmitter } from 'events'
 import createStoreModule from './store'
 import { mergeOptions } from './options'
 import { RefreshTokenException } from './exceptions'
@@ -22,9 +21,9 @@ export class VueJwtAuth {
     this.initializeStore()
     this.initializeTokenStoage()
     this.initializeTokenAutoRefresher()
-    this.initializeLoggedUser()
     this.initializeRouterGuard()
     this.initializeRouterRedirects()
+    this.initializeLoggedUser()
   }
 
   initializeStore () {
@@ -155,7 +154,7 @@ export class VueJwtAuth {
     )) {
       // If not ready, do nothing
       if (!this.context.getters.ready) {
-        return;
+        return
       }
       // Accesing route only for authenticated users
       if (!this.context.getters.logged) {
