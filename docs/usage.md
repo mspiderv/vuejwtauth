@@ -1,133 +1,51 @@
 ## Usage
 
-### Edit your `src/router.js` file
+In order to use this library, you need to create a new instance of `VueJwtAuth` class and pass these objects as constructor arguments:
+ - `router` - Your [VueRouter](https://router.vuejs.org/) instance (*required argument*)
+ - `options` - [Options object](configuration.md) (*optional argument*)
 
-Add this import
-```javascript
-import { authGuard } from '@mspiderv/vuejwtauth'
-```
+## Example usage in Vue.js application
 
-Then the whole `new Router({...})` object wrap into `authGuard` function. The result should looks like this:
-```javascript
-export default authGuard(new Router({
-    ...
-}))
-```
+Add the following code to your `src/main.js`.
 
-Alternatively, you can save your router into local variable, then wrap it with `authGuard` function and finally return it. The result would looks like this:
-```javascript
-const router = new Router({
-    ...
-});
+```vue
+import { VueJwtAuth, AxiosHttpDriver } from '@mspiderv/vuejwtauth'
 
-authGuard(router)
-
-export default router
-```
-
-### Edit your `src/store.js`
-
-Add this import
-```javascript
-import { createAuthStoreModule } from '@mspiderv/vuejwtauth'
-import AxiosHttpDriver from '@mspiderv/vuejwtauth/src/drivers/http/axios'
-```
-
-Somewhere under the imports, define your auth config object
-```javascript
-const authOptions = {
+new VueJwtAuth(router, {
   drivers: {
     http: new AxiosHttpDriver({
-      // Set your backend URL here
+      // Your API URL here
       apiBaseURL: 'http://127.0.0.1:3000/api/'
     })
   }
 }
 ```
 
-Feel free to extract this config object to another file.
+The result `src/main.js` can looks like this.
 
-Inside your store object add auth plugin
-```javascript
-plugins: [createAuthStoreModule(authOptions)]
-```
-
-The result should looks like this:
-```javascript
+```vue
 import Vue from 'vue'
-import Vuex from 'vuex'
-import { createAuthStoreModule } from '@mspiderv/vuejwtauth'
-import AxiosHttpDriver from '@mspiderv/vuejwtauth/src/drivers/http/axios'
+import App from './App.vue'
+import router from './router'
+import store from './store'
 
-const authOptions = {
+import { VueJwtAuth, AxiosHttpDriver } from '@mspiderv/vuejwtauth'
+
+Vue.config.productionTip = false
+
+new VueJwtAuth(router, {
   drivers: {
     http: new AxiosHttpDriver({
-      // Set your backend URL here
+      // Your API URL here
       apiBaseURL: 'http://127.0.0.1:3000/api/'
     })
   }
 }
 
-Vue.use(Vuex)
+new Vue({
+  router,
+  store,
+  render: h => h(App)
+}).$mount('#app')
 
-export default new Vuex.Store({
-  state: {},
-  mutations: {},
-  actions: {},
-  plugins: [createAuthStoreModule(authOptions)]
-})
-```
-
-### Protect your routes
-
-#### Routes only for authenticated users
-
-For every route, you want to make accessible only for **authenticated** users add following object:
-
-```javascript
-meta: { auth: true }
-```
-
-Example of route only for **authenticated** users definition:
-
-```javascript
-{
-    path: '/admin/dashboard',
-    name: 'dashboard',
-    component: Dashboard,
-    meta: { auth: true } // You need to be logged in to access this route
-}
-```
-
-#### Routes only for unauthenticated users
-
-For every route, you want to make accessible only for  **unauthenticated** users add following object:
-
-```javascript
-meta: { auth: false }
-```
-
-Example of route only for **unauthenticated** users definition:
-
-```javascript
-{
-    path: '/login',
-    name: 'login',
-    component: Login,
-    meta: { auth: false } // You need to be logged out to access this route
-}
-```
-
-#### Public routes
-
-Public route is such a route, that can be accessed by both **authenticated and unauthenticated** users. For every route, you want to make public **do not add** `meta { auth: ... }` object at all.
-
-Example:
-
-```javascript
-{
-    path: '/about',
-    name: 'about',
-    component: About
-}
 ```
