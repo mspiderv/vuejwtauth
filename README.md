@@ -1,6 +1,6 @@
 # JSON Web Tokens auth for [Vue.js](https://vuejs.org/) and [Quasar](https://quasar.dev/)
 
-This is a client-side [JSON Web Tokens (JWT)](https://jwt.io/) authentication library for [Vue.js](https://vuejs.org/) applications.
+This is a client-side [JSON Web Tokens (JWT)](https://jwt.io/) authentication package for [Vue.js](https://vuejs.org/) and [Quasar](https://quasar.dev/) applications.
 
 ## Contents
 
