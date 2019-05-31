@@ -66,7 +66,7 @@ Feel free to copy&pase following snippets.
       return {
         email: '',
         password: '',
-        rememberMe: true
+        rememberMe: false
       }
     },
     methods: {
