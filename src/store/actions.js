@@ -76,6 +76,7 @@ export default function (auth) {
     },
 
     async attemptLogin (context, { credentials, rememberMe }) {
+      context.commit('logout')
       context.commit('setRememberMe', rememberMe)
       await m.attemptLogin.call(
         { auth, context },
