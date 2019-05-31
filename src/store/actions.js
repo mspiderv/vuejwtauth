@@ -62,7 +62,7 @@ export default function (auth) {
       let token = await d.tokenStorage.getToken()
       if (token) {
         context.commit('setToken', token)
-        context.commit('setRememberMe', true)
+        context.commit('setRememberToken', true)
         try {
           await context.dispatch('refreshToken')
           if (auth.options.fetchUserAfterRememberedLogin) {
@@ -75,9 +75,9 @@ export default function (auth) {
       context.commit('setReady')
     },
 
-    async attemptLogin (context, { credentials, rememberMe }) {
+    async attemptLogin (context, { credentials, rememberToken }) {
       context.commit('logout')
-      context.commit('setRememberMe', rememberMe)
+      context.commit('setRememberToken', rememberToken)
       await m.attemptLogin.call(
         { auth, context },
         o.apiEndpoints.login.method,

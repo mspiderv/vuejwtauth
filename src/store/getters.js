@@ -21,8 +21,8 @@ export default function (auth) {
       return auth.options.drivers.tokenDecoder.decode(state.token)
     },
 
-    rememberMe (state) {
-      return state.rememberMe
+    rememberToken (state) {
+      return state.rememberToken
     }
   }
 }

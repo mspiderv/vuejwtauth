@@ -39,7 +39,7 @@ export class VueJwtAuth {
         // Save token to the storage after `setToken` mutation was commited
         if (mutation.type === `${this.options.module}/setToken`) {
           let token = this.context.getters.token
-          if (this.context.getters.rememberMe && token !== undefined && token !== null) {
+          if (this.context.getters.rememberToken && token !== undefined && token !== null) {
             this.options.drivers.tokenStorage.setToken(token)
           } else {
             this.options.drivers.tokenStorage.deleteToken()

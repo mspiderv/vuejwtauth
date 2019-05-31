@@ -17,8 +17,8 @@ export default function (auth) {
       state.user = {}
     },
 
-    setRememberMe (state, rememberMe) {
-      state.rememberMe = !!rememberMe
+    setRememberToken (state, rememberToken) {
+      state.rememberToken = !!rememberToken
     }
   }
 }
