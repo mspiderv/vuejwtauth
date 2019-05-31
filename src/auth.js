@@ -4,26 +4,31 @@ import { mergeOptions } from './options'
 import { RefreshTokenException } from './exceptions'
 
 export class VueJwtAuth {
-  constructor (router, store, options) {
-    this.store = store
-    this.router = router
+  constructor ({ Vue, router, store, options }) {
+    if (!router) {
+      throw 'VueRouter instance is required'
+    }
+
     this.options = mergeOptions(options)
+    Vue.prototype[this.options.vueProperty] = this
+    this.router = router
+
+    if (!store) {
+      store = new Vuex.Store()
+    }
+    this.store = store
 
     try {
-      this.initialize()
+      this.initializeStore()
+      this.initializeTokenStoage()
+      this.initializeTokenAutoRefresher()
+      this.initializeRouterGuard()
+      this.initializeRouterRedirects()
+      this.initializeLoggedUser()
       this.options.methods.onReady.call(this)
     } catch (error) {
       this.options.methods.handleError.call(this, error)
     }
-  }
-
-  initialize () {
-    this.initializeStore()
-    this.initializeTokenStoage()
-    this.initializeTokenAutoRefresher()
-    this.initializeRouterGuard()
-    this.initializeRouterRedirects()
-    this.initializeLoggedUser()
   }
 
   initializeStore () {
@@ -77,6 +82,9 @@ export class VueJwtAuth {
       }
 
       this.store.subscribe((mutation, state) => {
+        if (mutation.type === `${this.options.module}/logout`) {
+          this.tokenRefresher.clearTimeout()
+        }
         if (mutation.type === `${this.options.module}/setLogged` && !this.context.logged) {
           this.tokenRefresher.clearTimeout()
         }
@@ -174,5 +182,42 @@ export class VueJwtAuth {
         this.router.push(this.options.redirects.authenticated)
       }
     }
+  }
+
+  /* Proxy actions */
+  async initialize () {
+    return await this.context.dispatch('initialize')
+  }
+  async attemptLogin (credentials, rememberToken) {
+    return await this.context.dispatch('attemptLogin', { credentials, rememberToken })
+  }
+  async refreshToken () {
+    return await this.context.dispatch('refreshToken')
+  }
+  async fetchUser () {
+    return await this.context.dispatch('fetchUser')
+  }
+  async logout () {
+    return await this.context.dispatch('logout')
+  }
+
+  /* Proxy getters */
+  get logged () {
+    return this.context.getters.logged
+  }
+  get ready () {
+    return this.context.getters.ready
+  }
+  get user () {
+    return this.context.getters.user
+  }
+  get token () {
+    return this.context.getters.token
+  }
+  get decodedToken () {
+    return this.context.getters.decodedToken
+  }
+  get rememberToken () {
+    return this.context.getters.rememberToken
   }
 }

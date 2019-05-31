@@ -4,6 +4,7 @@ import { AxiosHttpDriver, DefaultJwtTokenDecoder, CookieTokenStorageDriver } fro
 import * as methods from './methods'
 
 export const defaultOptions = {
+  vueProperty: '$auth',
   module: 'auth',
   namespacedModule: true,
 

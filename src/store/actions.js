@@ -68,7 +68,8 @@ export default function (auth) {
      *  - fetchUserAfterTokenRefreshed
      *
      * @param context
-     * @param { credentials, rememberToken }
+     * @param credentials
+     * @param rememberToken
      * @return Promise<logged>
      */
     async attemptLogin (context, { credentials, rememberToken }) {

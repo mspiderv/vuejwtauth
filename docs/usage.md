@@ -1,51 +1,115 @@
 ## Usage
 
-In order to use this library, you need to create a new instance of `VueJwtAuth` class and pass these objects as constructor arguments:
- - `router` - Your [VueRouter](https://router.vuejs.org/) instance (*required argument*)
- - `options` - [Options object](configuration.md) (*optional argument*)
+Inside your Vue component scripts, you can access auth via `this.$auth`.
+Inside your templates via `$auth`
 
-## Example usage in Vue.js application
+### Available functions
 
-Add the following code to your `src/main.js`.
+You can call following functions on the `$auth` object:
+
+ - `attemptLogin(credentials, rememberToken).then(logged => ...).catch(fail => ...)`
+ - `logout().then(response => ...)`
+
+You can also call following functions, but in most cases you will not, because those are called automatically, by default. You can change this behavior in [options object](configuration.md).
+
+ - `initialize().then(logged => ...)` - Called automatically in `VueJwtAuth` constructor, by default.
+ - `refreshToken().then(token => ...)` - Called automatically a few seconds before current token expiration, by default.
+ - `fetchUser().then(user => ...)` - Called automatically after login and after token refresh, by default.
+
+### Available properties
+
+You can also access following properties:
+
+ - `logged` - Is user logged in?
+ - `ready` - Is auth initialized? If not, you should show *Loading...* for your users.
+ - `user` - User object (fetched by `fetchUser`)
+ - `token` - Access token (string)
+ - `decodedToken` - Access token (object)
+ - `rememberToken` - Remember current token in token storage?
+
+### Example code snippets
+
+Feel free to copy&pase following snippets.
+
+###### Code snippet of your main `App.vue` template.
 
 ```vue
-import { VueJwtAuth, AxiosHttpDriver } from '@mspiderv/vuejwtauth'
-
-new VueJwtAuth(router, {
-  drivers: {
-    http: new AxiosHttpDriver({
-      // Your API URL here
-      apiBaseURL: 'http://127.0.0.1:3000/api/'
-    })
-  }
-}
+<template>
+  <div>
+    <div v-if="$auth.ready">
+      <router-view />
+    </div>
+    <div v-if="!$auth.ready">
+      Loading ...
+    </div>
+  </div>
+</template>
 ```
 
-The result `src/main.js` can looks like this.
+###### Code snippet of your main `Login.vue` component.
 
 ```vue
-import Vue from 'vue'
-import App from './App.vue'
-import router from './router'
-import store from './store'
+<template>
+  <div>
+    <h4>Login form</h4>
+    <p><label><strong>E-mail:</strong> <input type="email" v-model="email"></label></p>
+    <p><label><strong>Password:</strong> <input type="password" v-model="password"></label></p>
+    <p><label><input type="checkbox" v-model="rememberMe"> Remember me</label></p>
+    <p><button @click="login">Submit</button></p>
+  </div>
+</template>
 
-import { VueJwtAuth, AxiosHttpDriver } from '@mspiderv/vuejwtauth'
+<script>
+  export default {
+    name: 'Login',
+    data() {
+      return {
+        email: '',
+        password: '',
+        rememberMe: true
+      }
+    },
+    methods: {
+      login() {
+        this.$auth.attemptLogin(
+          {
+            email: this.email,
+            password: this.password
+          },
+          this.rememberMe
+        ).then(() => {
+          console.log('You were logged in')
+        }).catch(error => {
+          console.log(error && error.response && error.response.status === 401
+                  ? 'Wrong e-mail or password'
+                  : 'Something went wrong'
+          )
+        })
+      }
+    }
+  }
+</script>
+```
 
-Vue.config.productionTip = false
+###### Code snippet of your main `LogoutButton.vue` component.
 
-new VueJwtAuth(router, {
-  drivers: {
-    http: new AxiosHttpDriver({
-      // Your API URL here
-      apiBaseURL: 'http://127.0.0.1:3000/api/'
-    })
+```vue
+<template>
+  <a href="#" @click.prevent="logout()" v-if="$auth.logged">Logout</a>
+</template>
+
+<script>
+export default {
+  name: 'LogoutButton',
+  methods: {
+    logout() {
+      this.$auth
+        .logout()
+        .then(() => console.log('Server-side logout finished'))
+        .catch(error => console.error('Server-side logout failed'))
+      console.log('Client-side logout finished')
+    }
   }
 }
-
-new Vue({
-  router,
-  store,
-  render: h => h(App)
-}).$mount('#app')
-
+</script>
 ```
