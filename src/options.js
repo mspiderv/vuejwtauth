@@ -11,10 +11,9 @@ export const defaultOptions = {
 
   autoInitialize: true,
 
-  fetchUserAfterLogin: false,
+  fetchUserAfterLogin: true,
   refreshTokenAfterLogin: true,
   fetchUserAfterTokenRefreshed: true,
-  fetchUserAfterRememberedLogin: false,
 
   storeModuleExtras: {},
 

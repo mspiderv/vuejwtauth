@@ -78,6 +78,9 @@ export class VueJwtAuth {
       }
 
       this.store.subscribe((mutation, state) => {
+        if (mutation.type === `${this.options.module}/setLogged` && !this.context.logged) {
+          this.tokenRefresher.clearTimeout()
+        }
         if (mutation.type === `${this.options.module}/setToken`) {
           this.tokenRefresher.clearTimeout()
           try {
@@ -106,6 +109,11 @@ export class VueJwtAuth {
 
   initializeRouterGuard () {
     this.router.beforeEach((to, from, next) => {
+      // If not ready, do nothing
+      if (!this.context.getters.ready) {
+        next()
+        return
+      }
       if (to.matched.some(route => route.meta[this.options.authMeta.key] === this.options.authMeta.value.authenticated)) {
         // Accesing route only for authenticated users
         if (this.context.getters.logged) {
@@ -145,6 +153,10 @@ export class VueJwtAuth {
       route.meta[this.options.authMeta.key] ===
       this.options.authMeta.value.authenticated
     )) {
+      // If not ready, do nothing
+      if (!this.context.getters.ready) {
+        return;
+      }
       // Accesing route only for authenticated users
       if (!this.context.getters.logged) {
         // We are not logged, so we need to login first

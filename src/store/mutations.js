@@ -1,24 +1,26 @@
 export default function (auth) {
   return {
-    setToken (state, token) {
-      state.token = token
-    },
-
-    setReady (state) {
-      state.ready = true
+    setLogged (state, logged) {
+      state.logged = !!logged
     },
 
     setUser (state, user) {
       state.user = user || {}
     },
 
-    logout (state) {
-      state.token = null
-      state.user = {}
+    setToken (state, token) {
+      state.token = token
     },
 
     setRememberToken (state, rememberToken) {
       state.rememberToken = !!rememberToken
+    },
+
+    logout (state) {
+      state.logged = false
+      state.user = {}
+      state.token = null
+      state.rememberToken = false
     }
   }
 }

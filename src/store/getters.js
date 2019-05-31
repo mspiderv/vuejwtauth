@@ -1,12 +1,12 @@
 export default function (auth) {
   return {
 
-    ready (state) {
-      return state.ready
+    logged (state) {
+      return state.logged
     },
 
-    logged (state) {
-      return state.token !== null && state.token !== undefined
+    ready (state) {
+      return state.logged === true || state.logged === false
     },
 
     user (state) {

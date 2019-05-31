@@ -5,6 +5,8 @@
 /**
  * Responsible for fetching the user by sending a HTTP request to API.
  *
+ * Warning: This function is also responsible for handling errors.
+ *
  * @param method
  * @param url
  * @param token
@@ -16,6 +18,8 @@ export async function fetchUser (method, url, token) {
 
 /**
  * Responsible for server-side logout by sending a HTTP request to API.
+ *
+ * Warning: This function is also responsible for handling errors.
  *
  * @param method
  * @param url
@@ -29,6 +33,8 @@ export async function serverSideLogout (method, url, token) {
 /**
  * Responsible for refreshing the token by sending a HTTP request to API.
  *
+ * Warning: This function is also responsible for handling errors.
+ *
  * @param method
  * @param url
  * @param token
@@ -40,6 +46,8 @@ export async function refreshToken (method, url, token) {
 
 /**
  * Responsible for logging in by sending a HTTP request to API.
+ * This function is probably not responsible for handling errors.
+ * You probably want to handle potential errors in the caller context.
  *
  * @param method
  * @param url
@@ -53,7 +61,6 @@ export async function attemptLogin (method, url, credentials) {
     credentials
   )
 }
-
 
 //
 // Response mappers
