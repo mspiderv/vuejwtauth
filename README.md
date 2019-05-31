@@ -15,8 +15,3 @@ This is a client-side [JSON Web Tokens (JWT)](https://jwt.io/) authentication li
 
 ## Do you need server-side JWT auth ?
 Take a look at our Laravel server-side package. - *comming soon*
-
-## Demos
-
-1. How to use this library in [Vue.js](https://vuejs.org/) application (*comming soon*)
-2. How to use this library in [Quasar](https://quasar.dev/) application (*comming soon*)
