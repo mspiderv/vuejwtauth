@@ -32,15 +32,17 @@ export class VueJwtAuth {
 
   initializeStore () {
     this.store.registerModule(this.options.module, createStoreModule(this))
-    // TODO: Maybe there is cleaner way to retrieve module context
-    this.context = this.store._modulesNamespaceMap[this.options.module + '/'].context
+    this.context = this.options.namespacedModule
+      // TODO: Maybe there is cleaner way to retrieve module context
+      ? this.store._modulesNamespaceMap[this.prefix('')].context
+      : this.store
   }
 
   initializeTokenStoage () {
     if (this.options.autoSyncTokenStoage) {
       this.store.subscribe((mutation, state) => {
         // Save token to the storage after `setToken` mutation was commited
-        if (mutation.type === `${this.options.module}/setToken`) {
+        if (mutation.type === this.prefix('setToken')) {
           let token = this.context.getters.token
           if (this.context.getters.rememberToken && token !== undefined && token !== null) {
             this.options.drivers.tokenStorage.setToken(token)
@@ -49,7 +51,7 @@ export class VueJwtAuth {
           }
         }
         // Remove token from the storage after `logout` mutation was commited
-        if (mutation.type === `${this.options.module}/logout`) {
+        if (mutation.type === this.prefix('logout')) {
           this.options.drivers.tokenStorage.deleteToken()
         }
       })
@@ -81,13 +83,13 @@ export class VueJwtAuth {
       }
 
       this.store.subscribe((mutation, state) => {
-        if (mutation.type === `${this.options.module}/logout`) {
+        if (mutation.type === this.prefix('logout')) {
           this.tokenRefresher.clearTimeout()
         }
-        if (mutation.type === `${this.options.module}/setLogged` && !this.context.logged) {
+        if (mutation.type === this.prefix('setLogged') && !this.context.logged) {
           this.tokenRefresher.clearTimeout()
         }
-        if (mutation.type === `${this.options.module}/setToken`) {
+        if (mutation.type === this.prefix('setToken')) {
           this.tokenRefresher.clearTimeout()
           let token = this.context.getters.token
           let decodedToken = this.options.drivers.tokenDecoder.decode(token)
@@ -174,6 +176,22 @@ export class VueJwtAuth {
       if (this.context.getters.logged) {
         // We are logged, so we need to redirect
         this.router.push(this.options.redirects.authenticated)
+      }
+    }
+  }
+
+  prefix (name) {
+    if (name === null || name === undefined) {
+      if (this.options.namespacedModule) {
+        return this.options.module
+      } else {
+        return ''
+      }
+    } else {
+      if (this.options.namespacedModule) {
+        return `${this.options.module}/${name}`
+      } else {
+        return name
       }
     }
   }
