@@ -104,4 +104,6 @@ export default ({ Vue, store, router }) => new VueJwtAuth({
 })
 ```
 
+**Note:** You need to append `'auth'` string into `boot` array in `quasar.conf.js` file. The `'auth'` boot file should be booted **after** the `'axios'`.
+
 ###### Continue reading to [Usage](usage.md)
