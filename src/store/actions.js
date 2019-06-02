@@ -3,6 +3,15 @@ export default function (auth) {
   let { options } = auth
   let { drivers, methods } = options
 
+  // Helpers
+  function emitAfterActionEvent (action, result) {
+    auth.emit(`action.${action}.after`, {
+      action: action,
+      result: result,
+      context: auth.context
+    })
+  }
+
   return {
     /**
      * This method is responsible for:
@@ -44,7 +53,10 @@ export default function (auth) {
       } else {
         context.commit('setLogged', false)
       }
-      return this.getters.logged
+
+      const logged = context.getters.logged
+      emitAfterActionEvent('initialize', logged)
+      return logged
     },
 
     /**
@@ -100,7 +112,9 @@ export default function (auth) {
         }
       }, 0)
 
-      return this.getters.logged
+      const logged = context.getters.logged
+      emitAfterActionEvent('attemptLogin', logged)
+      return logged
     },
 
     /**
@@ -138,6 +152,7 @@ export default function (auth) {
         context.dispatch('fetchUser')
       }
 
+      emitAfterActionEvent('refreshToken', token)
       return token
     },
 
@@ -170,6 +185,7 @@ export default function (auth) {
 
       context.commit('setUser', user)
 
+      emitAfterActionEvent('fetchUser', user)
       return user
     },
 
@@ -202,6 +218,10 @@ export default function (auth) {
         options.apiEndpoints.logout.url,
         token
       )
+        .then(response => {
+          emitAfterActionEvent('logout', response)
+          return response
+        })
     }
   }
 }

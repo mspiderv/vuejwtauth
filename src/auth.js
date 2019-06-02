@@ -1,6 +1,8 @@
+import Vuex from 'vuex'
 import { deepMerge } from './utils'
 import createStoreModule from './store'
 import { mergeOptions } from './options'
+import { EventEmitter2 } from 'eventemitter2'
 
 export class VueJwtAuth {
   constructor ({ Vue, router, store, options }) {
@@ -12,7 +14,13 @@ export class VueJwtAuth {
     Vue.prototype[this.options.vueProperty] = this
     this.router = router
 
+    this.eventEmitter = new EventEmitter2({
+      wildcard: true,
+      maxListeners: 100
+    })
+
     if (!store) {
+      Vue.use(Vuex)
       store = new Vuex.Store()
     }
     this.store = store
@@ -23,19 +31,42 @@ export class VueJwtAuth {
       this.initializeTokenAutoRefresher()
       this.initializeRouterGuard()
       this.initializeRouterRedirects()
-      this.initializeLoggedUser()
-      this.options.methods.onReady.call(this)
+
+      if (this.options.autoInitializeLoggedUser) {
+        this.initializeLoggedUser()
+      }
+
+      this.emit('ready', this)
     } catch (error) {
-      this.options.methods.handleError.call(this, error)
+      this.emit('error', error)
     }
   }
 
   initializeStore () {
     this.store.registerModule(this.options.module, createStoreModule(this))
+
     this.context = this.options.namespacedModule
       // TODO: Maybe there is cleaner way to retrieve module context
       ? this.store._modulesNamespaceMap[this.prefix('')].context
       : this.store
+
+    this.store.subscribe((mutation, state) => {
+      const unprefixedType = this.unprefix(mutation.type)
+      this.emit(`mutation.${unprefixedType}`, {
+        mutation: unprefixedType,
+        payload: mutation.payload,
+        context: this.context
+      })
+    })
+
+    this.store.subscribeAction((action, state) => {
+      const unprefixedType = this.unprefix(action.type)
+      this.emit(`action.${unprefixedType}`, {
+        action: unprefixedType,
+        payload: action.payload,
+        context: this.context
+      })
+    })
   }
 
   initializeTokenStoage () {
@@ -77,7 +108,7 @@ export class VueJwtAuth {
 
         refreshTokenHandler () {
           if (self.context.getters.logged) {
-            self.context.dispatch('refreshToken')
+            return self.context.dispatch('refreshToken')
           }
         }
       }
@@ -105,9 +136,7 @@ export class VueJwtAuth {
   }
 
   initializeLoggedUser () {
-    if (this.options.autoInitialize) {
-      this.context.dispatch('initialize')
-    }
+    return this.context.dispatch('initialize')
   }
 
   initializeRouterGuard () {
@@ -196,21 +225,27 @@ export class VueJwtAuth {
     }
   }
 
+  unprefix (name) {
+    return (this.options.namespacedModule)
+      ? name.slice(this.options.module.length + 1)
+      : name
+  }
+
   /* Proxy actions */
-  async initialize () {
-    return await this.context.dispatch('initialize')
+  initialize () {
+    return this.context.dispatch('initialize')
   }
-  async attemptLogin (credentials, rememberToken) {
-    return await this.context.dispatch('attemptLogin', { credentials, rememberToken })
+  attemptLogin (credentials, rememberToken) {
+    return this.context.dispatch('attemptLogin', { credentials, rememberToken })
   }
-  async refreshToken () {
-    return await this.context.dispatch('refreshToken')
+  refreshToken () {
+    return this.context.dispatch('refreshToken')
   }
-  async fetchUser () {
-    return await this.context.dispatch('fetchUser')
+  fetchUser () {
+    return this.context.dispatch('fetchUser')
   }
-  async logout () {
-    return await this.context.dispatch('logout')
+  logout () {
+    return this.context.dispatch('logout')
   }
 
   /* Proxy getters */
@@ -231,5 +266,54 @@ export class VueJwtAuth {
   }
   get rememberToken () {
     return this.context.getters.rememberToken
+  }
+
+  /* Proxy emitter */
+  on (...params) {
+    return this.eventEmitter.on(...params)
+  }
+
+  prependListener (...params) {
+    return this.eventEmitter.prependListener(...params)
+  }
+
+  onAny (...params) {
+    return this.eventEmitter.onAny(...params)
+  }
+
+  prependAny (...params) {
+    return this.eventEmitter.prependAny(...params)
+  }
+
+  once (...params) {
+    return this.eventEmitter.once(...params)
+  }
+
+  prependOnceListener (...params) {
+    return this.eventEmitter.prependOnceListener(...params)
+  }
+
+  many (...params) {
+    return this.eventEmitter.many(...params)
+  }
+
+  prependMany (...params) {
+    return this.eventEmitter.prependMany(...params)
+  }
+
+  removeListener (...params) {
+    return this.eventEmitter.removeListener(...params)
+  }
+
+  off (...params) {
+    return this.eventEmitter.off(...params)
+  }
+
+  offAny (...params) {
+    return this.eventEmitter.offAny(...params)
+  }
+
+  emit (...params) {
+    return this.eventEmitter.emit(...params)
   }
 }

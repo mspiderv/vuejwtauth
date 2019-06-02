@@ -95,27 +95,3 @@ export function mapRefreshTokenResponseToToken (response) {
 export function mapFetchUserResponseToUserData (response) {
   return response.data.user
 }
-
-//
-// Auth callbacks
-//
-
-/**
- * Responsible for handling auth ready callback.
- *
- * `this` points to auth instance
- * @return {Promise<void>}
- */
-export function onReady () {
-  //
-}
-
-/**
- * Responsible for handling auth errors.
- *
- * `this` points to auth instance
- * @param error
- */
-export function handleError (error) {
-  console.error('Auth error', error)
-}

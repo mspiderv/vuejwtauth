@@ -28,6 +28,7 @@
     "axios": "^0.18.0",
     "browser-cookies": "^1.2.0",
     "deepmerge": "^3.2.0",
+    "eventemitter2": "^5.0.1",
     "jwt-decode": "^2.2.0",
     "vuex": "^3.1.1"
   },
