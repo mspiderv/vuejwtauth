@@ -15,6 +15,7 @@ npm install @mspiderv/vuejwtauth --save
 ### Update your application code
 
 In order to use this library, you need to create a new instance of `VueJwtAuth` class and pass an object with these properties as the only constructor argument:
+ - `Vue` - [Vue](https://vuejs.org/) class (**required argument**)
  - `router` - Your [VueRouter](https://router.vuejs.org/) instance (**required argument**)
  - `store` - Your [Vuex](https://vuejs.org/) instance (*optional argument*)
  - `options` - [Options object](configuration.md) (*optional argument*)
@@ -27,6 +28,7 @@ Add the following code to your `src/main.js`.
 import { VueJwtAuth, AxiosHttpDriver } from '@mspiderv/vuejwtauth'
 
 new VueJwtAuth({
+  Vue, // required
   router, // required
   store, // optional
   options: { // optional
@@ -53,6 +55,7 @@ import { VueJwtAuth, AxiosHttpDriver } from '@mspiderv/vuejwtauth'
 Vue.config.productionTip = false
 
 new VueJwtAuth({
+  Vue, // required
   router, // required
   store, // optional
   options: { // optional
@@ -86,9 +89,10 @@ Fill the created file `src/boot/auth.js` with the following content
 ```vue
 import { VueJwtAuth, AxiosHttpDriver } from '@mspiderv/vuejwtauth'
 
-export default ({ store, router }) => new VueJwtAuth({
-  router, // required
-  store, // optional
+export default ({ Vue, store, router }) => new VueJwtAuth({
+  Vue,
+  router,
+  store,
   options: { // optional
     drivers: {
       http: new AxiosHttpDriver({

@@ -1,4 +1,3 @@
-import Vue from 'vue'
 import Vuex from 'vuex'
 import { deepMerge } from './utils'
 import createStoreModule from './store'
@@ -6,7 +5,7 @@ import { mergeOptions } from './options'
 import { EventEmitter2 } from 'eventemitter2'
 
 export class VueJwtAuth {
-  constructor ({ router, store, options }) {
+  constructor ({ Vue, router, store, options }) {
     if (!router) {
       throw 'VueRouter instance is required'
     }
