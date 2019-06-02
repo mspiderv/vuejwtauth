@@ -25,21 +25,17 @@ export class VueJwtAuth {
     }
     this.store = store
 
-    try {
-      this.initializeStore()
-      this.initializeTokenStoage()
-      this.initializeTokenAutoRefresher()
-      this.initializeRouterGuard()
-      this.initializeRouterRedirects()
+    this.initializeStore()
+    this.initializeTokenStoage()
+    this.initializeTokenAutoRefresher()
+    this.initializeRouterGuard()
+    this.initializeRouterRedirects()
 
-      if (this.options.autoInitializeLoggedUser) {
-        this.initializeLoggedUser()
-      }
-
-      this.emit('ready', this)
-    } catch (error) {
-      this.emit('error', error)
+    if (this.options.autoInitializeLoggedUser) {
+      this.initializeLoggedUser()
     }
+
+    this.emit('ready', this)
   }
 
   initializeStore () {
