@@ -12,7 +12,7 @@
    - `localStorage` driver.
    - You can create your own *token storage* driver.
  - **Logout** functionality.
-   - Automatically logout idle users.
+   - Automatically logout idle users (after 5 minutes by default, but you can configure it or fully disable).
  - **Fetch user** functionality (retrieve any extra information about logged user from API).
  - **Automatically refreshes JWT** to make it valid for ever (based on JWT `exp` property).
  - **Decodes JWT** to JSON.
