@@ -6,16 +6,16 @@
 
 ## Features
 
- - **Login** functionality
+ - **Login** functionality.
  - **Remember me** functionality. Stores JWT in *token storage*, using one of the following drivers:
-   - `cookie` driver (*recommended*)
-   - `localStorage` driver
+   - `cookie` driver (*recommended*).
+   - `localStorage` driver.
    - You can create your own *token storage* driver.
- - **Logout** functionality
-   - Automatically logout idle users - *comming soon*
- - **Fetch user** functionality (retrieve any extra information about logged user from API)
- - **Automatically refreshes JWT** to make it valid for ever (based on JWT `exp` property)
- - **Decodes JWT** to JSON
+ - **Logout** functionality.
+   - Automatically logout idle users - *comming soon*.
+ - **Fetch user** functionality (retrieve any extra information about logged user from API).
+ - **Automatically refreshes JWT** to make it valid for ever (based on JWT `exp` property).
+ - **Decodes JWT** to JSON.
    - Allows you to read information from JWT directly.
    - Includes [jwt-decode](https://github.com/auth0/jwt-decode) under the hood.
    - You can create your own *token decoder* driver.
@@ -23,7 +23,7 @@
    - [Axios](https://github.com/axios/axios) HTTP driver.
    - You can create your own *HTTP* driver.
  - Uses [Vuex](https://vuex.vuejs.org/) under the hood, which allows you to use all Vuex module functionality directly.
- - Fully [configurable](docs/configuration.md)
+ - Fully [configurable](docs/configuration.md).
 
 ## Contents
 
@@ -35,4 +35,4 @@
 ## Requirements
 
 1. This package assumes, you use [VueRouter](https://router.vuejs.org/) in your application.
-2. JWT auth server.
+2. JWT auth server. (Do you need a server-side JWT auth solution? Take a look at our Laravel server-side package - *comming soon*)
