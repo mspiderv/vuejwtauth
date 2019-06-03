@@ -99,22 +99,23 @@ export default function (auth) {
         .then(methods.mapLoginResponseToToken.bind({ auth, context }))
         .then(token => context.commit('setToken', token))
         .then(() => context.commit('setLogged', true))
+        .catch(error => {
+          emitAfterActionEvent('attemptLogin', false)
+          throw error
+        })
 
       // Run following code asynchronously, so the caller context will NOT wait until this finishes
       setTimeout(async () => {
-        if (context.getters.logged) {
           if (auth.options.refreshTokenAfterLogin) {
             await context.dispatch('refreshToken')
           }
           if (!auth.options.fetchUserAfterTokenRefreshed && auth.options.fetchUserAfterLogin) {
             await context.dispatch('fetchUser')
           }
-        }
       }, 0)
 
-      const logged = context.getters.logged
-      emitAfterActionEvent('attemptLogin', logged)
-      return logged
+      emitAfterActionEvent('attemptLogin', true)
+      return true
     },
 
     /**

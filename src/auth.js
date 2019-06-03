@@ -31,6 +31,7 @@ export class VueJwtAuth {
     this.initializeTokenAutoRefresher()
     this.initializeRouterGuard()
     this.initializeRouterRedirects()
+    this.initializeEvents()
 
     if (this.options.autoLogout) {
       this.initializeAutoLogout()
@@ -134,6 +135,16 @@ export class VueJwtAuth {
         }
       })
     }
+  }
+
+  initializeEvents () {
+    this.eventEmitter.on('action.attemptLogin.after', (data) => {
+      if (data.result) {
+        this.eventEmitter.emit('login.success', data)
+      } else {
+        this.eventEmitter.emit('login.failed', data)
+      }
+    })
   }
 
   initializeAutoLogout () {
