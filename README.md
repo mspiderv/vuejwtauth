@@ -36,3 +36,13 @@
 
 1. This package assumes, you use [VueRouter](https://router.vuejs.org/) in your application.
 2. JWT auth server. (Do you need a server-side JWT auth solution? Take a look at our Laravel server-side package - *comming soon*)
+
+## Thanks to
+
+These are the main packages we use under the hood.
+
+ - [axios](https://github.com/axios/axios)
+ - [voltace/browser-cookies](https://github.com/voltace/browser-cookies)
+ - [TehShrike/deepmerge](https://github.com/TehShrike/deepmerge)
+ - [EventEmitter2](https://github.com/EventEmitter2/EventEmitter2)
+ - [auth0/jwt-decode](https://github.com/auth0/jwt-decode)
