@@ -17,7 +17,7 @@
  - **Automatically refreshes JWT** to make it valid for ever (based on JWT `exp` property).
  - **Decodes JWT** to JSON.
    - Allows you to read information from JWT directly.
-   - Includes [jwt-decode](https://github.com/auth0/jwt-decode) under the hood.
+   - Uses [jwt-decode](https://github.com/auth0/jwt-decode) under the hood.
    - You can create your own *token decoder* driver.
  - Sends HTTP requests to your JWT auth API, using one of the following drivers:
    - [Axios](https://github.com/axios/axios) HTTP driver.
