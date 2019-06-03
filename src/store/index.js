@@ -12,6 +12,7 @@ export default function (auth) {
     getters: createGetters(auth),
     mutations: createMutations(auth),
 
+    // TODO: toto spravit ako funkciu ktora bere `auth` a vracia objekt ktory sa destruktne ?
     ...auth.options.storeModuleExtras
   }
 }

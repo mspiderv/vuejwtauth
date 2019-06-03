@@ -16,7 +16,8 @@ export class VueJwtAuth {
 
     this.eventEmitter = new EventEmitter2({
       wildcard: true,
-      maxListeners: 100
+      maxListeners: 100,
+      ...this.options.authEventEmitter2ExtraOptions,
     })
 
     if (!store) {
@@ -30,6 +31,10 @@ export class VueJwtAuth {
     this.initializeTokenAutoRefresher()
     this.initializeRouterGuard()
     this.initializeRouterRedirects()
+
+    if (this.options.autoLogout) {
+      this.initializeAutoLogout()
+    }
 
     if (this.options.autoInitializeLoggedUser) {
       this.initializeLoggedUser()
@@ -129,6 +134,26 @@ export class VueJwtAuth {
         }
       })
     }
+  }
+
+  initializeAutoLogout () {
+    this.options.drivers.idleDetector.registerEvents()
+    this.options.drivers.idleDetector.resetTimer(false)
+
+    this.on('mutation.setLogged', ({ payload }) => {
+      if (payload) {
+        this.options.drivers.idleDetector.resetTimer(false)
+      }
+    })
+
+    this.options.drivers.idleDetector.onIdle(() => {
+      if (this.context.getters.logged) {
+        this.emit(`autoLogout`)
+        this.context.dispatch('logout').then(() => {
+          this.emit(`autoLogout.after`)
+        })
+      }
+    })
   }
 
   initializeLoggedUser () {

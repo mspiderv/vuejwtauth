@@ -1,5 +1,5 @@
 import { deepMerge } from './utils'
-import { AxiosHttpDriver, DefaultJwtTokenDecoder, CookieTokenStorageDriver } from './drivers'
+import { AxiosHttpDriver, DefaultJwtTokenDecoder, CookieTokenStorageDriver, IdleDetectionDriver } from './drivers'
 
 import * as methods from './methods'
 
@@ -7,6 +7,8 @@ export const defaultOptions = {
   vueProperty: '$auth',
   module: 'auth',
   namespacedModule: true,
+
+  autoLogout: true,
 
   autoInitializeLoggedUser: true,
 
@@ -31,10 +33,13 @@ export const defaultOptions = {
   // "Auth library, please refresh my token {value} seconds before it expires"
   refreshTokenSecondsAhead: 10,
 
+  authEventEmitter2ExtraOptions: {},
+
   drivers: {
     http: new AxiosHttpDriver(),
     tokenDecoder: new DefaultJwtTokenDecoder(),
-    tokenStorage: new CookieTokenStorageDriver()
+    tokenStorage: new CookieTokenStorageDriver(),
+    idleDetector: new IdleDetectionDriver(),
   },
 
   apiEndpoints: {
