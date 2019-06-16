@@ -4,7 +4,10 @@ import { deepMerge } from '../../utils'
 export const AxiosHttpDriverDefaultOptions = {
   tokenType: 'Bearer',
   apiBaseURL: '/',
-  authorizationHeader: 'Authorization'
+  authorizationHeader: 'Authorization',
+  responseChecker (response) {
+    return true
+  }
 }
 
 export class AxiosHttpDriver {
@@ -12,7 +15,6 @@ export class AxiosHttpDriver {
     this.options = deepMerge(AxiosHttpDriverDefaultOptions, options)
   }
 
-  // Send request helpers
   async sendRequest (method, url, data = {}, config = {}) {
     return axios.request({
       method,
@@ -22,7 +24,7 @@ export class AxiosHttpDriver {
       ...config
     })
       .then(response => {
-        if (!response || !response.data || !response.data.status || response.data.status !== 'success') {
+        if (this.options.responseChecker && !this.options.responseChecker(response)) {
           throw new Error('API request failed')
         }
 
