@@ -1,6 +1,6 @@
 {
   "name": "@mspiderv/vuejwtauth",
-  "version": "1.2.2",
+  "version": "1.2.3",
   "description": "JWT auth library for Vue.js applications",
   "main": "src/index.js",
   "scripts": {
