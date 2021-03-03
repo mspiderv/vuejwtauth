@@ -25,7 +25,7 @@
   },
   "homepage": "https://github.com/mspiderv/vuejwtauth#readme",
   "dependencies": {
-    "axios": "^0.18.0",
+    "axios": ">=0.21.1",
     "browser-cookies": "^1.2.0",
     "deepmerge": "^3.2.0",
     "eventemitter2": "^5.0.1",
